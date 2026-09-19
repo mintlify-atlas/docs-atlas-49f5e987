@@ -1,13 +1,13 @@
 ---
-title: "PolyBotOptions: Bot Configuration Reference"
+title: "PolyBotOptions: Complete Bot Configuration Reference"
 sidebarTitle: "PolyBotOptions"
-description: "Complete reference for all PolyBotOptions properties — bot identity, client settings, polling, and webhook configuration — with defaults and appsettings examples."
+description: "Complete reference for all PolyBotOptions properties — bot identity, client settings, polling, and webhook configuration — with defaults and examples."
 ---
 
 `PolyBotOptions` is the single configuration entry point for a PolyBot bot. It covers the bot token and identity, Telegram client settings, long-polling parameters, and webhook parameters. Values are loaded from the `"PolyBot"` configuration section first and then overridden per-property by anything you pass to the `PolyBotClient` constructor.
 
 <Note>
-Constructor values always take precedence over configuration-section values. The merge logic is additive for booleans (`UseTestEnvironment`, `DropPendingUpdates` are OR-ed) and last-wins for everything else. `DeleteWebhookOnStop` follows the constructor value unconditionally when a `PolyBotOptions` instance is provided.
+Constructor values always take precedence over configuration-section values. The merge rules are: `UseTestEnvironment` and `DropPendingUpdates` are OR-ed with the configuration value; `DeleteWebhookOnStop` and `WebhookMaxConnections` unconditionally take the constructor value (even `false` / `0`); all nullable string and array properties use null-coalescing (constructor wins when non-null); and `PollingLimit` / `PollingOffset` use null-coalescing as well.
 </Note>
 
 ---

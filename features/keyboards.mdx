@@ -1,7 +1,7 @@
 ---
 title: "Keyboards: Fluent Builders and Source-Generated Layouts"
 sidebarTitle: "Keyboards"
-description: "Build keyboards with fluent builders or declare fixed layouts via [CallbackButton] on partial methods — the source generator emits the markup body for you."
+description: "Build keyboards with fluent builders or declare layouts via [CallbackButton] on partial methods — the source generator emits the markup body for you."
 ---
 
 PolyBot provides two approaches to constructing Telegram keyboards: a chainable fluent API for runtime-assembled markups, and a declarative source-generated approach where you annotate a `partial` method with `[CallbackButton]` attributes and the generator emits the implementation. Both produce standard `Telegram.Bot` markup types.
@@ -147,7 +147,7 @@ Partial properties have no parameters, so `{parameter}` placeholders only work o
 
 - The containing type **must be `partial`**.
 - The method or property return type must be `InlineKeyboardMarkup`; any other type is a compile-time error (`CUR018`).
-- Generic containing types and non-`partial` members produce warning `CUR019` and are skipped.
+- Non-`partial` members and generic methods produce warning `CUR019` and are skipped.
 
 ## Diagnostics reference
 
@@ -166,5 +166,5 @@ A `[CallbackButton]`-annotated method or property does not return `InlineKeyboar
 <Accordion title="CUR019 – Non-partial or generic member">
 **Severity:** Warning
 
-A `[CallbackButton]`-annotated member is not declared `partial`, or its containing type is generic. The generator cannot emit an implementation and skips the member.
+A `[CallbackButton]`-annotated member is not declared `partial`, or the method itself is generic. The generator cannot emit an implementation and skips the member.
 </Accordion>

@@ -1,5 +1,5 @@
 ---
-title: "Exception Handling: Centralised Error Reporting"
+title: "Exception Handling: Centralised Bot Error Reporting"
 sidebarTitle: "Exception Handling"
 description: "Centralise bot error handling with one [ExceptionHandler] method: receive the exception and source, inject DI services, and keep the polling loop alive."
 ---
@@ -29,7 +29,7 @@ Parameters are resolved the same way as handler parameters, with two differences
 
 - `Exception`, `HandleErrorSource`, `ITelegramBotClient`, and `CancellationToken` are injected from the error callback arguments directly.
 - Everything else is resolved from the DI container — including keyed services via `[Key("name")] T`.
-- **Update-bound parameters are not available.** There is no current update in the error path. Declaring a parameter that would normally be bound to an update payload (e.g. `Message`, `Update`) is rejected at compile time with `CUR032`.
+- **Update-bound parameters are not available.** There is no current update in the error path. Declaring a parameter that would normally be bound to an update payload (e.g. `Message`, `Update`) or a keyed service without a constant key is rejected at compile time with `CUR032`.
 
 ```csharp
 // ITelegramBotClient, Exception, HandleErrorSource, and CancellationToken
@@ -123,10 +123,10 @@ public sealed partial class BotHandlers
 
 ## Diagnostics reference
 
-<Accordion title="CUR032 – Update-bound parameter in exception handler">
+<Accordion title="CUR032 – Update-bound or invalid-keyed parameter in exception handler">
 **Severity:** Error
 
-A `[ExceptionHandler]` method declares a parameter that would normally be resolved from the current update (e.g. `Message`, `Update`, `CallbackQuery`). There is no current update in the error path; the parameter is rejected.
+A `[ExceptionHandler]` method declares a parameter that is update-bound (e.g. `Message`, `Update`, `CallbackQuery`) or keyed with a non-constant key. There is no current update in the error path; the parameter is dropped.
 </Accordion>
 
 <Accordion title="CUR033 – Multiple [ExceptionHandler] methods">

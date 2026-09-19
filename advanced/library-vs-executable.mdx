@@ -1,7 +1,7 @@
 ---
-title: "Library vs Executable: PolyBot Project Types"
+title: "PolyBot Library vs Executable: OutputType Explained"
 sidebarTitle: "Library vs Executable"
-description: "How OutputType controls what the source generator emits, when to use a filter library, cross-assembly filter usage, and a worked example with a shared filter library and bot executable."
+description: "How OutputType controls what PolyBot generates, when to use filter libraries, cross-assembly filter usage, and a full example with a shared filter library."
 ---
 
 The PolyBot source generator produces different output depending on the `OutputType` of the consuming project. Understanding this distinction lets you share filters and keyboards across multiple bot projects without duplicating logic or causing type collisions.
@@ -50,7 +50,7 @@ No routing infrastructure (`BotRouter`, `AddPolyBotRouter`, hosting/webhook inte
 
 Declaring a handler method (`[MessageHandler]`, `[CallbackQueryHandler]`, etc.) in a library project produces `CUR036` (warning):
 
-```
+```text
 Handler 'StartHandler' is declared in a library project: only runnable assemblies
 (OutputType Exe/WinExe) get a generated router, so this handler never runs.
 ```
@@ -80,7 +80,7 @@ All handlers declared in the executable are compiled into the router. Filters de
 
 A handler in an executable can use a filter that is defined (and whose `[XxxFilter]` attribute is emitted) in a referenced library. The generator resolves the pairing at build time:
 
-```
+```text
 MyBot.exe
   └── references MyFilters.dll (OutputType=Library)
        └── public class NonEmptyTextFilter : MessageFilter

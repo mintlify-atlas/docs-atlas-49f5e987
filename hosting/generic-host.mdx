@@ -1,7 +1,7 @@
 ---
-title: "Generic Host Long Polling for PolyBot Bots"
+title: "Generic Host Integration with AddPolyBotHostedPolling"
 sidebarTitle: "Generic Host"
-description: "Integrate PolyBot into Microsoft.Extensions.Hosting with AddPolyBotHostedPolling — background polling, DI lifecycle, and graceful shutdown wired automatically."
+description: "Host a PolyBot bot inside a .NET generic host: AddPolyBotHostedPolling registers the generated router and IHostedService polling lifecycle."
 ---
 
 When your project references `Microsoft.Extensions.Hosting.Abstractions`, the PolyBot source generator emits `PolyBotPollingHostedService` and the `AddPolyBotHostedPolling` extension method. This integration lets you run a PolyBot bot as an `IHostedService` inside any `IHost`-based application, alongside logging, configuration, and other hosted services.
@@ -16,8 +16,8 @@ The hosted-polling integration is **generated only when `Microsoft.Extensions.Ho
 
 | Phase | Behaviour |
 |---|---|
-| `StartAsync` | Calls `GetMe` to back-fill `PolyBotOptions.BotUsername`, then starts `PollAsync` in the background on a new task. |
-| Background polling | Calls `DeleteWebhook` (to remove any stale webhook), then enters `ReceiveAsync`, passing each update to the generated router. The loop runs until the stopping token is cancelled. |
+| `StartAsync` | Starts `PollAsync` in the background via `Task.Run`, then awaits `GetMe` to back-fill `PolyBotOptions.BotUsername`. |
+| Background polling (`PollAsync`) | Calls `DeleteWebhook` first (to clear any stale webhook), then enters `ReceiveAsync`, passing each update to the generated router. The loop runs until the stopping token is cancelled. |
 | `StopAsync` | Signals the stopping `CancellationTokenSource`, then waits for the polling task to finish (bounded by the host's shutdown timeout). |
 
 ## Registration
@@ -32,7 +32,7 @@ services.AddPolyBotHostedPolling(receiver =>
 ```
 
 <Warning>
-`PolyBotOptions` must be registered as a singleton **before** calling `AddPolyBotHostedPolling`. The hosted service resolves it from the DI container on construction. Register it yourself or use `AddPolyBotWebhook`'s configure delegate pattern if you need options set at registration time.
+`PolyBotOptions` must be registered as a singleton **before** calling `AddPolyBotHostedPolling`. The hosted service resolves it from the DI container on construction. Register it yourself before calling `AddPolyBotHostedPolling`.
 </Warning>
 
 The `ReceiverOptions` delegate is optional — omitting it uses defaults (no update drop, all update types, no limit override):

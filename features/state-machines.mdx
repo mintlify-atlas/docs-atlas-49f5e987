@@ -237,3 +237,17 @@ public static async Task<Result> CollectAge(
     return Result.Handled();
 }
 ```
+
+## Diagnostics reference
+
+<Accordion title="CUR010 – [State]/[NoState] type argument is not an enum">
+**Severity:** Error
+
+The type argument of `[State<TEnum>]` or `[NoState<TEnum>]` is not an enum type. The attribute is ignored and the handler routes unconditionally.
+</Accordion>
+
+<Accordion title="CUR011 – [State] and [NoState] declared for the same enum and StateKey">
+**Severity:** Warning
+
+A handler declares both `[State<TEnum>]` and `[NoState<TEnum>]` for the same enum type and `StateKey`. The conditions are AND-ed, which means the handler can never match any update. Remove one of the conflicting attributes.
+</Accordion>

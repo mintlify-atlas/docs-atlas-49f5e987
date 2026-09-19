@@ -1,7 +1,7 @@
 ---
-title: "PolyBot Source Generator Internals Explained"
+title: "PolyBot Roslyn Source Generator Internals and Design"
 sidebarTitle: "Source Generator"
-description: "How the Roslyn incremental source generator works: discovery phases, emitters, what gets generated for executables vs libraries, and the InternalsGenerators companion project."
+description: "Inside the PolyBot incremental source generator: discovery phases, emitter classes, generated files for executables vs libraries, and InternalsGenerators."
 ---
 
 PolyBot's entire routing pipeline is produced at compile time by a Roslyn incremental source generator. There is no reflection, no runtime scanning, and no delegate lists — the output is a single `BotRouter` class whose `HandleUpdateAsync` method is a plain `switch` over `update.Type` with hard-coded, inlined handler calls. This page explains how the generator works from the inside.
@@ -116,12 +116,11 @@ All generated filter attributes go into the `PolyBot.Attributes` namespace and u
 
 ### `AwaiterExtensionsEmitter`
 
-Generates `PolyBotAwaiterExtensions.g.cs` with:
+Generates `PolyBotAwaiterExtensions.g.cs` (namespace `PolyBot.Attributes`) with one `With{FilterName}(this UpdateAwaiterBuilder<TDto>)` extension per discovered concrete filter. The `With*` method is typed to the filter's DTO base (`MessageFilter` → `UpdateAwaiterBuilder<Message>`) when possible, or generic (`UpdateAwaiterBuilder<TUpdate>`) otherwise.
 
-- One `WaitFor{UpdateType}Async(this IUpdateAwaiter, TimeSpan?)` extension method per Telegram.Bot `UpdateType` (returns `UpdateAwaiterBuilder<TPayload>`)
-- One `With{FilterName}(this UpdateAwaiterBuilder<TDto>)` extension per discovered filter
-
-The `With*` methods are typed to the filter's DTO base (`MessageFilter` → `UpdateAwaiterBuilder<Message>`) when possible, or generic otherwise.
+<Note>
+The `WaitFor{UpdateType}Async(this IUpdateAwaiter, TimeSpan?)` entry-point extensions are **not** emitted by `PolyBotGenerator`. They are emitted by the companion `PolyBot.InternalsGenerators` project directly into the `PolyBot` library assembly (also into namespace `PolyBot.Attributes`, class `PolyBotAwaiterExtensions`). Both generators emit into the same class name, which is a `partial` class split across two generated files.
+</Note>
 
 ### `KeyboardMarkupEmitter`
 
@@ -172,6 +171,7 @@ A second generator project, `PolyBot.InternalsGenerators`, generates the interna
 - The abstract handler attribute bases (`MessageHandlerAttribute`, etc.), one per `UpdateType`, each stamped with `[UpdateHandlerDescriptor(UpdateType.Message, "Message")]`
 - The abstract generated filter DTO bases (`MessageFilter`, `CallbackQueryFilter`, etc.) with their `CanPass(Update)` implementations that extract the payload
 - Per-update-type narrowing filter bases for DTOs shared across multiple update types
+- The `WaitFor{UpdateType}Async(this IUpdateAwaiter, TimeSpan?)` extension methods in namespace `PolyBot.Attributes` (class `PolyBotAwaiterExtensions`), compiled directly into the `PolyBot` library assembly — these are always available regardless of whether any `IUpdateFilter` is discovered in the consuming project
 
 This separation means `PolyBot.dll` (the library the user references) never directly depends on `Telegram.Bot`'s `UpdateType` enum at the source level — the generated bases do — and the main generator can read the handler attribute metadata from compiled symbols rather than hardcoding `UpdateType` member names.
 

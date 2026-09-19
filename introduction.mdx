@@ -8,7 +8,7 @@ PolyBot is a generative, DI-friendly routing framework built on top of [Telegram
 
 ## How it works
 
-Every handler method you annotate with an `[XxxHandler]` attribute becomes a typed branch inside the generated `BotRouter`. The router is emitted into the `PolyBot` namespace as `BotRouter`, and a companion `PolyBotExtensions.AddPolyBotRouter()` extension method is generated so you can register the router in any `IServiceCollection` with one line.
+Every handler method you annotate with an `[XxxHandler]` attribute from the `PolyBot.Attributes` namespace becomes a typed branch inside the generated `BotRouter`. The router is emitted into the `PolyBot` namespace as `BotRouter`, and a companion `PolyBotExtensions.AddPolyBotRouter()` extension method is generated so you can register the router in any `IServiceCollection` with one line.
 
 Because the router is **compiled output**, not reflection-based dispatch, the full routing graph is visible to the C# compiler. Diagnostics (prefixed `CUR0xx`) surface misconfigurations — wrong return types, duplicate exception handlers, unreachable state conditions — as build warnings and errors rather than runtime surprises.
 
@@ -18,7 +18,7 @@ Parameter injection is resolved at code-generation time as well. The generator i
 
 <CardGroup cols={2}>
   <Card title="Attribute routing" icon="tag">
-    One attribute per `UpdateType`: `[MessageHandler]`, `[CallbackQueryHandler]`, `[InlineQueryHandler]`, and more. Return `Result.StopRouting` to end dispatch or `Result.ContinueRouting` to fall through to the next handler. Order handlers with `Priority` or rely on source order.
+    One attribute per `UpdateType` from the `PolyBot.Attributes` namespace: `[MessageHandler]`, `[CallbackQueryHandler]`, `[InlineQueryHandler]`, `[ChosenInlineResultHandler]`, `[ShippingQueryHandler]`, `[PreCheckoutQueryHandler]`, `[PollHandler]`, `[PollAnswerHandler]`, `[ExceptionHandler]`, and more. Return `Result.StopRouting` to end dispatch or `Result.ContinueRouting` to fall through to the next handler. Order handlers with `Priority` (higher value = runs earlier) or rely on source order.
   </Card>
   <Card title="Dependency injection" icon="plug">
     Handler parameters are resolved automatically. `ITelegramBotClient`, `CancellationToken`, `Update`, and the extracted payload (`Message`, `CallbackQuery`, …) are injected from the update context; everything else comes from `IServiceProvider` — including keyed services via `[Key("x")]`.

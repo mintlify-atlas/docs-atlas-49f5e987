@@ -1,7 +1,7 @@
 ---
-title: "PolyBot Interfaces and Concrete Implementations"
+title: "PolyBot Interfaces, Implementations, and DI Defaults"
 sidebarTitle: "Interfaces"
-description: "Reference for all public PolyBot interfaces — IUpdateFilter, IStateMachine, IStateStorage, IUpdateAwaiter, IBotFatherSync — plus concrete implementations and DI registration defaults."
+description: "Reference for PolyBot interfaces — IUpdateFilter, IStateMachine, IStateStorage, IUpdateAwaiter, IBotFatherSync — with implementations and DI defaults."
 ---
 
 PolyBot exposes a set of focused interfaces that you interact with at runtime: a gate interface for filtering updates, a typed FSM facade for managing conversation state, a raw storage interface for custom persistence, an awaiter interface for suspending handlers mid-conversation, and a BotFather sync interface for managing command menus. This page documents each interface, its methods, and the concrete implementations registered by default.
@@ -119,7 +119,7 @@ Both methods return the resulting state (or `null` when cleared). Both throw `In
 [MessageHandler, State<Step>(Step.AwaitingAge)]
 public static async Task<Result> HandleAge(Message msg, IStateMachine fsm)
 {
-    TEnum? next = await fsm.AdvanceAsync<Step>();
+    Step? next = await fsm.AdvanceAsync<Step>();
     // next == Step.Completed (or null if Step.AwaitingAge was the last value)
     return Result.StopRouting;
 }
@@ -175,10 +175,15 @@ Implementations namespace keys internally by enum type, so states of different e
 The built-in `IStateStorage` backed by a `ConcurrentDictionary<(Type, string), Entry>`. Suitable for development and single-instance bots; not shared across process restarts or multiple app instances.
 
 ```csharp
+// Single constructor — defaultExpiration is optional
+public MemoryStateStorage(TimeSpan? defaultExpiration = null)
+```
+
+```csharp
 // Without expiration (entries live forever)
 new MemoryStateStorage()
 
-// With a 30-minute sliding expiration
+// With a 30-minute expiration (entries expire 30 minutes after last write)
 new MemoryStateStorage(TimeSpan.FromMinutes(30))
 ```
 
@@ -295,19 +300,20 @@ public interface IBotFatherSync
 | `IStateMachine` | `StateMachine` | Singleton |
 | `IUpdateContextAccessor` | `UpdateContextAccessor` | Singleton |
 | `IUpdateAwaiter` | `UpdateAwaiter` | Singleton |
-| `ITelegramBotClient` | `TelegramBotClient` (from token) | Singleton |
 
-`AddPolyBotRouter()` additionally registers:
+`AddPolyBotRouter()` calls `AddPolyBotDefaults()` first, then additionally registers (without try-add — these always replace):
 
 | Service | Implementation | Lifetime |
 |---|---|---|
-| `IUpdateHandler` | Generated `BotRouter` | Singleton |
+| `BotRouter` | Generated `BotRouter` | Singleton |
+| `IUpdateHandler` | Forwarded to `BotRouter` | Singleton |
 | `IBotFatherSync` | Generated `PolyBotBotFatherSync` | Singleton |
 
-To override `IStateStorage` with a custom implementation, register it **before** `AddPolyBotDefaults()` or `AddPolyBotRouter()`:
+`ITelegramBotClient` is registered separately — by `PolyBotClient.BuildProvider()` when using the standalone runner, or by your own DI setup when using the generic host or ASP.NET Core.
+
+To override `IStateStorage` with a custom implementation, register it **before** `AddPolyBotRouter()` (which calls `AddPolyBotDefaults()` internally — try-add semantics mean your earlier registration wins):
 
 ```csharp
 services.AddSingleton<IStateStorage, RedisStateStorage>();
-services.AddPolyBotDefaults();
-services.AddPolyBotRouter();
+services.AddPolyBotRouter(); // internally calls AddPolyBotDefaults(); try-add skips MemoryStateStorage
 ```

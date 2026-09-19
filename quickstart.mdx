@@ -121,10 +121,10 @@ public static class Program
 
   A few things to note:
 
-  - **`Priority`** controls dispatch order within an update type. Lower numbers run first; `Start` at `-1` runs before `Echo` at `0`.
+  - **`Priority`** controls dispatch order within an update type. **Higher values run first** (source order is used when `Priority` is omitted). `Echo` at `0` runs before `Start` at `-1`; `Start`'s `[Command]` filter then narrows it to `/start` messages only.
   - **`[Command(Aliases = ["start"])]`** restricts `Start` to messages whose first entity is `/start`. `Echo` has no command restriction and catches all remaining messages.
   - **Parameters** are injected automatically. `Message` comes from the current update; `ITelegramBotClient` and `CancellationToken` are standard DI/update-context injections.
-  - **`Result.Handled()`** is shorthand for `Result.StopRouting` — it stops dispatch after this handler runs. Use `Result.ContinueRouting` to pass the update on to lower-priority handlers.
+  - **`Result.Handled()`** is shorthand for `Result.StopRouting` — it stops dispatch after this handler runs. Use `Result.ContinueRouting` to pass the update on to the next handler.
 
   ### Generate a keyboard (optional)
 

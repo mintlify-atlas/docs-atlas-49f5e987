@@ -1,7 +1,7 @@
 ---
-title: "PolyBot Diagnostics: CUR001–CUR036 Reference"
+title: "PolyBot Compiler Diagnostics: CUR001–CUR036 Guide"
 sidebarTitle: "Diagnostics"
-description: "Complete reference for every PolyBot compiler diagnostic (CUR001–CUR036) — severity, trigger condition, and how to fix each one, grouped by feature area."
+description: "Complete reference for every PolyBot source-generator diagnostic (CUR001–CUR036) — severity, trigger condition, and fix, grouped by feature area."
 ---
 
 The PolyBot source generator reports diagnostics as standard Roslyn compiler messages. Warnings do not prevent compilation but indicate that an attribute or parameter was silently skipped. Errors prevent the affected handler, keyboard, or pattern from being emitted and must be resolved before the router will compile. All diagnostics use the `CUR` prefix and appear in the Error List / build output like any other C# diagnostic.

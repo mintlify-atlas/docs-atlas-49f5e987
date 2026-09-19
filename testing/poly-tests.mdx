@@ -1,7 +1,7 @@
 ---
-title: "PolyTests: In-Memory ITelegramBotClient Double"
+title: "PolyTests: Offline ITelegramBotClient for PolyBot Tests"
 sidebarTitle: "PolyTests"
-description: "Drive any PolyBot hosting model offline using PolyTests — enqueue synthetic updates, assert outgoing requests, and test polling or webhook services without a token."
+description: "PolyTests is PolyBot's offline ITelegramBotClient double: enqueue synthetic updates with long-poll semantics and assert outgoing requests, no token needed."
 ---
 
 `PolyTests` is an in-memory implementation of `ITelegramBotClient` designed for automated testing. Register it instead of the real `TelegramBotClient` and you get a fully offline, deterministic test double that delivers synthetic updates to the polling loop with long-poll semantics and records every outgoing request for assertions.
@@ -41,20 +41,23 @@ testClient.EnqueueUpdate(new Update
 
 ### EnqueueUpdates
 
-Enqueues multiple updates in order. Each call to `EnqueueUpdate` within the method signals the polling loop independently, so updates are never lost even if they arrive faster than the loop processes them.
+Enqueues multiple updates in order. Each update signals the polling loop independently, so updates are never lost even if they arrive faster than the loop processes them.
 
 ```csharp
 testClient.EnqueueUpdates(new[]
 {
-    TestHost.MessageUpdate(1, "first",  userId: 10, chatId: 1),
-    TestHost.MessageUpdate(2, "second", userId: 10, chatId: 1),
-    TestHost.MessageUpdate(3, "third",  userId: 10, chatId: 1),
+    new Update { Id = 1, Message = new Message { Id = 1, Text = "first",
+        From = new User { Id = 10, FirstName = "Test" },
+        Chat = new Chat { Id = 1, Type = ChatType.Private } } },
+    new Update { Id = 2, Message = new Message { Id = 2, Text = "second",
+        From = new User { Id = 10, FirstName = "Test" },
+        Chat = new Chat { Id = 1, Type = ChatType.Private } } },
 });
 ```
 
 ## Asserting outgoing requests
 
-`SentRequests` returns a snapshot of every request the framework sent through the client, in the order they were made:
+`SentRequests` returns an `IReadOnlyList<object>` snapshot of every request the framework sent through the client, in the order they were made:
 
 ```csharp
 IReadOnlyList<object> sent = testClient.SentRequests;
@@ -80,7 +83,7 @@ Assert.IsTrue(sent.OfType<SetMyCommandsRequest>().Any());
 
 ## BotUser
 
-The `User` returned by `GetMe`. Defaults to a test bot user; override it when your handlers read the bot's identity:
+The `User` returned by `GetMe` calls. Its type is `Telegram.Bot.Types.User`. The default value is:
 
 ```csharp
 public User BotUser { get; set; } = new User
@@ -92,7 +95,7 @@ public User BotUser { get; set; } = new User
 };
 ```
 
-Override before the test runs:
+Override it before the test runs when your handlers read the bot's identity:
 
 ```csharp
 testClient.BotUser = new User
@@ -127,7 +130,7 @@ If your handlers call API methods not in the supported list (e.g. `SendPhoto`, `
 
 `GetUpdatesRequest` is handled with genuine long-poll behaviour:
 
-1. If the queue contains updates, they are dequeued immediately (up to `request.Limit`, defaulting to 100) and returned.
+1. If the queue contains updates, they are dequeued immediately (up to `request.Limit`, defaulting to 100) and returned as a batch.
 2. If the queue is empty, the method waits asynchronously until either `EnqueueUpdate` signals an update or the `CancellationToken` is cancelled.
 3. When `StopAsync` cancels the token, `GetUpdatesRequest` throws `OperationCanceledException`, ending the polling loop cleanly.
 
@@ -145,8 +148,9 @@ public async Task HostedPolling_DeliversEnqueuedUpdates()
 
     ServiceCollection services = new ServiceCollection();
     services.AddSingleton(new PolyBotOptions { BotUsername = "testbot" });
-    services.AddSingleton<IWelcomeService, WelcomeService>();
     services.AddSingleton<ITelegramBotClient>(testClient);
+    services.AddSingleton<IWelcomeService, WelcomeService>();
+    services.AddPolyBotRouter();
     services.AddPolyBotHostedPolling();
 
     await using ServiceProvider provider = services.BuildServiceProvider();
@@ -192,7 +196,7 @@ public async Task HostedPolling_DeliversEnqueuedUpdates()
 
 ## Using PolyTests with AddPolyBotWebhook
 
-For webhook integration tests, resolve the hosted service to apply options, then call the endpoint method directly:
+For webhook integration tests, resolve the hosted service to trigger `StartAsync`, which calls `SetWebhook`, then stop it to trigger `DeleteWebhook`:
 
 ```csharp
 [TestMethod]

@@ -1,7 +1,7 @@
 ---
-title: "UpdateExtensions: Update Payload Helper Methods"
+title: "UpdateExtensions: Telegram Update Payload Probe Methods"
 sidebarTitle: "Update Extensions"
-description: "Reference for the UpdateExtensions static class — first-match probe methods that extract user ids, chat ids, senders, chats, messages, and text from any Update payload type."
+description: "Reference for UpdateExtensions — first-match probes that extract user ids, chat ids, senders, chats, messages, and text from any Telegram Update."
 ---
 
 `PolyBot.Routing.UpdateExtensions` is a static class of extension methods on `Telegram.Bot.Types.Update`. A Telegram `Update` carries one of many optional payload properties (`Message`, `CallbackQuery`, `PollAnswer`, etc.), and different payload types nest their user and chat information in different places. These helpers walk a fixed probe order and return the first match found, so you never need to write property-chain `??` chains by hand.
@@ -74,7 +74,7 @@ public static Message? GetMessage(this Update update)
 
 Returns the first message-shaped payload in the update using a simple four-property chain:
 
-```
+```text
 Message ?? EditedMessage ?? ChannelPost ?? EditedChannelPost
 ```
 
@@ -92,7 +92,8 @@ Returns the text of the message returned by `GetMessage()`, falling back to its 
 
 ```csharp
 // Equivalent to:
-// update.GetMessage()?.Text ?? update.GetMessage()?.Caption
+// var msg = update.GetMessage();
+// return msg?.Text ?? msg?.Caption;
 ```
 
 <ResponseField name="return" type="string?">
