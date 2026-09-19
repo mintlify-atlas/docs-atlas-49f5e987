@@ -1,0 +1,130 @@
+{
+  "projectType": "framework",
+  "projectName": "PolyBot",
+  "projectDescription": "A Roslyn source-generator-powered, DI-friendly routing framework for Telegram.Bot that replaces hand-written update switch statements with attribute-decorated handler methods.",
+  "theme": "luma",
+  "primaryColor": "#2563EB",
+  "lightColor": "#3B82F6",
+  "darkColor": "#1D4ED8",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/handlers",
+              "concepts/parameter-injection",
+              "concepts/routing-result",
+              "concepts/filters"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/commands",
+              "features/state-machines",
+              "features/keyboards",
+              "features/callback-patterns",
+              "features/inline-awaits",
+              "features/rate-limiting",
+              "features/exception-handling"
+            ]
+          },
+          {
+            "group": "Hosting & Deployment",
+            "pages": [
+              "hosting/polling",
+              "hosting/generic-host",
+              "hosting/webhooks"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "testing/test-harness",
+              "testing/poly-tests"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "reference/polybotoptions",
+              "reference/attributes",
+              "reference/interfaces",
+              "reference/update-extensions",
+              "reference/diagnostics"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/source-generator",
+              "advanced/library-vs-executable"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Attribute-based handler routing via Roslyn source generators — no hand-written switch statements",
+    "Full DI integration: handler parameters are resolved from the service container automatically",
+    "Command routing with [Command] attribute, BotFather auto-sync, and argument extraction via [Arg]/[Rest]",
+    "Finite state machine support with [State<TEnum>] / [NoState<TEnum>] and pluggable IStateStorage",
+    "Inline conversation awaits via IUpdateAwaiter — suspend handlers mid-conversation without blocking",
+    "Declarative sliding-window rate limiting with [Throttled]",
+    "Fluent keyboard builders (InlineKeyboardBuilder, ReplyKeyboardBuilder) plus generated keyboards via [CallbackButton]",
+    "Callback-data pattern matching via [Pattern(\"item:{id}:{action}\")] with typed [Arg] extraction",
+    "Exception handling via [ExceptionHandler]",
+    "Long-polling, Generic Host hosted service, and ASP.NET Core webhook integrations — generated only when the matching packages are referenced",
+    "Token-free in-memory test harness via PolyBotClient.RunTest() / UpdateMocker and PolyTests"
+  ],
+  "publicApiSurface": [
+    "PolyBotClient",
+    "PolyBotOptions",
+    "PolyBotServiceCollectionExtensions.AddPolyBotDefaults()",
+    "PolyBotServiceCollectionExtensions.AddPolyBotRouter() [generated]",
+    "PolyBotServiceCollectionExtensions.AddPolyBotHostedPolling() [generated]",
+    "PolyBotServiceCollectionExtensions.AddPolyBotWebhook() [generated]",
+    "IApplicationBuilder.MapPolyBotWebhook(path) [generated]",
+    "HandlerAttribute (base for [MessageHandler], [CallbackQueryHandler], etc.)",
+    "CommandAttribute",
+    "PatternAttribute",
+    "StateAttribute<TEnum>",
+    "NoStateAttribute<TEnum>",
+    "ThrottledAttribute",
+    "ExceptionHandlerAttribute",
+    "CallbackButtonAttribute",
+    "ArgAttribute",
+    "RestAttribute",
+    "ParseAttribute",
+    "KeyAttribute",
+    "Result (ContinueRouting / StopRouting / Handled())",
+    "IUpdateFilter",
+    "IStateMachine",
+    "IStateStorage",
+    "MemoryStateStorage",
+    "IUpdateAwaiter",
+    "UpdateAwaiterBuilder<TUpdate>",
+    "InlineKeyboardBuilder",
+    "ReplyKeyboardBuilder",
+    "UpdateExtensions (GetUserId, GetChatId, GetSender, GetChat, GetMessage, GetText)",
+    "UpdateMocker",
+    "PolyTests"
+  ]
+}

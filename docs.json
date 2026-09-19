@@ -1,72 +1,96 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "PolyBot",
+  "theme": "luma",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "type": "github",
+      "href": "https://github.com/Rikitav/PolyBot"
     }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/Rikitav/PolyBot"
     }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/handlers",
+              "concepts/parameter-injection",
+              "concepts/routing-result",
+              "concepts/filters"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/commands",
+              "features/state-machines",
+              "features/keyboards",
+              "features/callback-patterns",
+              "features/inline-awaits",
+              "features/rate-limiting",
+              "features/exception-handling"
+            ]
+          },
+          {
+            "group": "Hosting & Deployment",
+            "pages": [
+              "hosting/polling",
+              "hosting/generic-host",
+              "hosting/webhooks"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "testing/test-harness",
+              "testing/poly-tests"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "reference/polybotoptions",
+              "reference/attributes",
+              "reference/interfaces",
+              "reference/update-extensions",
+              "reference/diagnostics"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/source-generator",
+              "advanced/library-vs-executable"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
